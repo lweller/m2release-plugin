@@ -36,6 +36,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Cause;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Item;
@@ -69,6 +70,7 @@ import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.Exported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -267,6 +269,7 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 					// Release error
 					listener.getLogger().println("[M2Release] Last release failed. Trying to perform an auto-rollback.");
 					
+					bld.getProject().scheduleBuild(0, new ReleaseFailedCause(), new M2ReleaseArgumentInterceptorAction(rollbackGoals) );
 					
 				}
 				
