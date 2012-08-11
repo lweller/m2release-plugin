@@ -36,6 +36,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Cause;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Item;
@@ -69,6 +70,7 @@ import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.Exported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,14 +99,15 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 	private String                        releaseEnvVar                = DescriptorImpl.DEFAULT_RELEASE_ENVVAR;
 	private String                        releaseGoals                 = DescriptorImpl.DEFAULT_RELEASE_GOALS;
 	private String                        dryRunGoals                  = DescriptorImpl.DEFAULT_DRYRUN_GOALS;
+	private String                        rollbackGoals                = DescriptorImpl.DEFAULT_ROLLBACK_GOALS;
 	public boolean                        selectCustomScmCommentPrefix = DescriptorImpl.DEFAULT_SELECT_CUSTOM_SCM_COMMENT_PREFIX;
 	public boolean                        selectAppendHudsonUsername   = DescriptorImpl.DEFAULT_SELECT_APPEND_HUDSON_USERNAME;
 	public boolean                        selectScmCredentials         = DescriptorImpl.DEFAULT_SELECT_SCM_CREDENTIALS;
-	
+	public boolean                        enableAutoRollback           = DescriptorImpl.DEFAULT_ENABLE_AUTO_ROLLBACK;
 	public int                            numberOfReleaseBuildsToKeep  = DescriptorImpl.DEFAULT_NUMBER_OF_RELEASE_BUILDS_TO_KEEP;
 	
 	@DataBoundConstructor
-	public M2ReleaseBuildWrapper(String releaseGoals, String dryRunGoals, boolean selectCustomScmCommentPrefix, boolean selectAppendHudsonUsername, boolean selectScmCredentials, String releaseEnvVar, String scmUserEnvVar, String scmPasswordEnvVar, String scmTagTemplate, int numberOfReleaseBuildsToKeep) {
+	public M2ReleaseBuildWrapper(String releaseGoals, String dryRunGoals, String rollbackGoals, boolean selectCustomScmCommentPrefix, boolean selectAppendHudsonUsername, boolean selectScmCredentials, String releaseEnvVar, String scmUserEnvVar, String scmPasswordEnvVar, String scmTagTemplate, int numberOfReleaseBuildsToKeep) {
 		super();
 		this.releaseGoals = releaseGoals;
 		this.dryRunGoals = dryRunGoals;
@@ -116,6 +119,8 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 		this.scmPasswordEnvVar = scmPasswordEnvVar;
 		this.numberOfReleaseBuildsToKeep = numberOfReleaseBuildsToKeep;
 		this.scmTagTemplate = scmTagTemplate;
+		this.enableAutoRollback = enableAutoRollback;
+		this.rollbackGoals = rollbackGoals;
 	}
 
 
@@ -193,6 +198,8 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 				final MavenModuleSet mmSet = getModuleSet(bld);
 				M2ReleaseArgumentsAction args = bld.getAction(M2ReleaseArgumentsAction.class);
 				
+				log.info("[M2Release] After build : {}, [}", args.isEnableAutoRollback() , bld.getResult() );
+				
 				if (args.isDryRun()) {
 					lstnr.getLogger().println("[M2Release] its only a dryRun, no need to mark it for keep");
 				}
@@ -228,6 +235,7 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 						}
 					}
 				}
+				
 
 				if (args.isCloseNexusStage() && !args.isDryRun()) {
 					StageClient client = new StageClient(new URL(getDescriptor().getNexusURL()), getDescriptor()
@@ -260,6 +268,15 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 						retVal = false;
 					}
 				}
+				
+				if (!args.isDryRun() && args.isEnableAutoRollback() && bld.getResult() != null && bld.getResult().isWorseThan(Result.SUCCESS)){
+					// Release error
+					listener.getLogger().println("[M2Release] Last release failed. Trying to perform an auto-rollback.");
+					log.info("[M2Release] Autorollback");
+					bld.getProject().scheduleBuild(0, new ReleaseFailedCause(), new M2ReleaseArgumentInterceptorAction(rollbackGoals) );
+					
+				}
+				
 				return retVal;
 			}
 
@@ -468,10 +485,12 @@ public class M2ReleaseBuildWrapper extends BuildWrapper {
 		public static final String     DEFAULT_DEV_VERSION_ENVVAR = "MVN_DEV_VERSION"; //$NON-NLS-1$
 		public static final String     DEFAULT_DRYRUN_ENVVAR = "MVN_ISDRYRUN"; //$NON-NLS-1$
 		public static final String     DEFAULT_SCM_TAG_TEMPLATE = "${ARTIFACT_ID}-${VERSION}";
+		public static final String     DEFAULT_ROLLBACK_GOALS ="release:rollback" ;
 
 		public static final boolean    DEFAULT_SELECT_CUSTOM_SCM_COMMENT_PREFIX = false;
 		public static final boolean    DEFAULT_SELECT_APPEND_HUDSON_USERNAME    = false;
 		public static final boolean    DEFAULT_SELECT_SCM_CREDENTIALS           = false;
+		public static final boolean    DEFAULT_ENABLE_AUTO_ROLLBACK             = false;
 
 		public static final int        DEFAULT_NUMBER_OF_RELEASE_BUILDS_TO_KEEP = 1;
 

@@ -14,6 +14,15 @@
 		<f:textbox field="dryRunGoals" value="${h.defaulted(instance.dryRunGoals,descriptor.DEFAULT_DRYRUN_GOALS)}"/>
 	</f:entry>  
 
+	<f:entry title="Enable auto-rollback" help="/plugin/m2release/help-projectConfig-enableAutoRollback.html">
+		<f:checkbox name="enableAutoRollback" checked="${h.defaulted(instance.enableAutoRollback,descriptor.DEFAULT_ENABLE_AUTO_ROLLBACK)}"/>
+	</f:entry>
+	
+	<f:entry title="Rollback goals and options" help="/plugin/m2release/help-projectConfig-rollbackGoals.html">
+		<f:textbox field="rollbackGoals" value="${h.defaulted(instance.rollbackGoals,descriptor.DEFAULT_ROLLBACK_GOALS)}"/>
+	</f:entry>
+	
+
 	<f:entry title="Number of successful release builds to keep" help="/plugin/m2release/help-projectConfig-numberOfReleaseBuildsToKeep.html">
 		<f:textbox field="numberOfReleaseBuildsToKeep" value="${instance.numberOfReleaseBuildsToKeep}" />
 	</f:entry>
