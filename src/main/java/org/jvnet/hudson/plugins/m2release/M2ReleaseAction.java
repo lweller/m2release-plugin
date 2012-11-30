@@ -233,7 +233,7 @@ public class M2ReleaseAction implements PermalinkProjectAction {
 		final boolean specifyScmCommentPrefix = httpParams.containsKey("specifyScmCommentPrefix"); //$NON-NLS-1$
 		final String scmCommentPrefix = specifyScmCommentPrefix ? getString("scmCommentPrefix", httpParams) : null; //$NON-NLS-1$
 		final boolean specifyScmTag = httpParams.containsKey("specifyScmTag"); //$NON-NLS-1$
-		final String scmTag = specifyScmTag ? getString("scmTag", httpParams) : null; //$NON-NLS-1$
+		final String scmTag = specifyScmTag ? getString("scmTag", httpParams) : computeScmTag(); //$NON-NLS-1$
 
 		final boolean appendHusonUserName = specifyScmCommentPrefix && httpParams.containsKey("appendHudsonUserName"); //$NON-NLS-1$
 		final boolean isDryRun = httpParams.containsKey("isDryRun"); //$NON-NLS-1$
