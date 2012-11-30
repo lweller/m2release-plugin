@@ -237,7 +237,8 @@ public class M2ReleaseAction implements PermalinkProjectAction {
 
 		final boolean appendHusonUserName = specifyScmCommentPrefix && httpParams.containsKey("appendHudsonUserName"); //$NON-NLS-1$
 		final boolean isDryRun = httpParams.containsKey("isDryRun"); //$NON-NLS-1$
-
+		final boolean enableAutoRollback = httpParams.containsKey("enableAutoRollback");
+		
 		final String releaseVersion = getString("releaseVersion", httpParams); //$NON-NLS-1$
 		final String developmentVersion = getString("developmentVersion", httpParams); //$NON-NLS-1$
 
@@ -285,7 +286,7 @@ public class M2ReleaseAction implements PermalinkProjectAction {
 
 		M2ReleaseArgumentsAction arguments = new M2ReleaseArgumentsAction();
 		arguments.setDryRun(isDryRun);
-
+		arguments.setEnableAutoRollback(enableAutoRollback);
 		arguments.setReleaseVersion(releaseVersion);
 		arguments.setDevelopmentVersion(developmentVersion);
 		// TODO - re-implement versions on specific modules.
