@@ -4,7 +4,7 @@
 	<groupId>org.jvnet.hudson.plugins.m2release</groupId>
 	<artifactId>m2release</artifactId>
 	<packaging>hpi</packaging>
-	<version>0.10.0</version>
+	<version>0.10.0.UNO-01-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
@@ -38,9 +38,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/jenkinsci/m2release-plugin.git</connection>
-		<developerConnection>scm:git:https://github.com/jenkinsci/m2release-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/m2release-plugin/</url>
+		<connection>scm:git:https://github.com/lweller/m2release-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:lweller/m2release-plugin.git</developerConnection>
+		<url>https://github.com/lweller/m2release-plugin/</url>
 	</scm>
 
 	<licenses>
