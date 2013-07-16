@@ -38,9 +38,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/jenkinsci/m2release-plugin.git</connection>
-		<developerConnection>scm:git:https://github.com/jenkinsci/m2release-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/m2release-plugin/</url>
+		<connection>scm:git:https://github.com/lweller/m2release-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:lweller/m2release-plugin.git</developerConnection>
+		<url>https://github.com/lweller/m2release-plugin/</url>
 	</scm>
 
 	<licenses>
